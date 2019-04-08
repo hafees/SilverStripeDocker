@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  php-apache:
+    build:
+      args:
+        - PHP_VERSION=${PHP_VERSION}
+      context: ./
+      dockerfile: php.dockerFile
+    working_dir: /var/www/app
+    volumes:
+      - "./app:/var/www/app"
+    ports:
+      - $SITE_PORT:80
+
+  composer:
+    image: composer
+    volumes:
+      - ./:/app
+    command: bash -c "composer --ignore-platform-reqs create-project silverstripe/installer ./app || (echo SilverStripe already installed. )"
+
+  mysql:
+    build:
+      args:
+        - MYSQL_VERSION=${MYSQL_TAG}
+      context: ./
+      dockerfile: mysql.dockerFile
+    volumes:
+      - "./.db_data:/var/lib/mysql"
+      - "./mysql/db.sql:/root/db.sql"
+    environment:
+      - "MYSQL_ROOT_PASSWORD=${DB_PASSWORD}"
+
+  # PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      - "PMA_USER=root"
+      - "PMA_PASSWORD=${DB_PASSWORD}"
+    ports:
+      - ${MYADMIN_PORT}:80
+    restart: always
+    depends_on:
+      - mysql
+    links:
+      - mysql:db
