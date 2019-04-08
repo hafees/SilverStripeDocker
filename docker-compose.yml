@@ -10,6 +10,8 @@ services:
     working_dir: /var/www/app
     volumes:
       - "./app:/var/www/app"
+      - ./silverstripe.env:/var/www/app/.env
+      - ./php/php.ini:/usr/local/etc/php/php.ini
     ports:
       - $SITE_PORT:80
 

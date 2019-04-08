@@ -38,7 +38,12 @@ RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir \
 RUN docker-php-ext-install gd \
         intl \
         pdo \
-        pdo_mysql
+        pdo_mysql 
+
+#Install Tidy
+RUN apt-get install -y libtidy-dev \
+        && docker-php-ext-install tidy \
+        && docker-php-ext-enable tidy
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- \
